@@ -1,0 +1,15 @@
+[package]
+name = "plugin_test_kit"
+version = { workspace = true }
+edition = { workspace = true }
+
+
+
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+macro_plugin = { workspace = true }
+plugin = { workspace = true }
+

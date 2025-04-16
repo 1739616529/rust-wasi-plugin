@@ -1,0 +1,12 @@
+[package]
+name = "native"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# 如果需要依赖 macro_plugin
+anyhow = "1.0"
+plugin = { workspace = true }
+wasmer = "5.0.4"
+wasmer-wasix = {  version = "0.34.0", features = ["journal"] }
+tokio = { workspace = true }
