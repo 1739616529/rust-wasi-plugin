@@ -22,4 +22,4 @@ codegen-units = 1
 [workspace.dependencies]
 macro_plugin                = { path = "crate/macro_plugin" }
 plugin                      = { path = "crate/plugin" }
-tokio                       = { version = "1", default-features = false }
+tokio                       = { version = "1.44.2", default-features = false }
