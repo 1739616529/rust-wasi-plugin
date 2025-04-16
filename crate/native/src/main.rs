@@ -1,9 +1,8 @@
-use std::env;
-use std::io::stdout;
+
 use std::sync::Arc;
 use wasmer::{imports, Function, Instance, Module, Store, TypedFunction};
 use wasmer_wasix::http::default_http_client;
-use wasmer_wasix::{default_fs_backing, VirtualFile, WasiEnv, WasiFs};
+use wasmer_wasix::{default_fs_backing, WasiEnv};
 use wasmer_wasix::{
     runtime::{
         module_cache::{ModuleCache, SharedCache},
@@ -30,13 +29,29 @@ fn demo1() -> Result<(), Box<dyn std::error::Error>> {
     let mut store = Store::default();
 
     let module = Module::new(&store, wasm_bytes)?;
-    let mut builder = WasiEnv::builder("add");
+    let builder = WasiEnv::builder("add");
+    let rt = build_rt();
+    let builder = builder.runtime(rt).fs(default_fs_backing());
     let wasi_env = builder.finalize(&mut store)?;
     let wasi_env_import_object = wasi_env.import_object(&mut store, &module)?;
+
+    
+    // Define the __add function
+    let __add = Function::new_typed(&mut store, |a: i32, b: i32| -> i32 {
+        a + b
+    });
+
     let mut import_object = imports! {
-        // "fd_write" => Function::
+        "env" => {
+            "add" => __add.clone(),
+            "_add" => __add.clone(),
+            "__add" => __add.clone(),
+            "___add" => __add.clone(),
+        }
     };
     import_object.extend(&wasi_env_import_object);
+
+
 
     let instance = Instance::new(&mut store, &module, &import_object).unwrap();
     let dyn_f: &Function = instance.exports.get("add").unwrap();
