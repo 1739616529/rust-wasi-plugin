@@ -30,19 +30,8 @@ fn demo1() -> Result<(), Box<dyn std::error::Error>> {
     let mut store = Store::default();
 
     let module = Module::new(&store, wasm_bytes)?;
-
-    let runtime = build_rt();
-
     let mut builder = WasiEnv::builder("add");
-    builder = builder.runtime(runtime.clone());
-    let wasi_env_builder = if let Ok(cwd) = env::current_dir() {
-        builder
-            .fs(default_fs_backing())
-            .map_dirs(vec![("/cwd".to_string(), cwd)].drain(..))?
-    } else {
-        builder
-    };
-    let wasi_env = wasi_env_builder.finalize(&mut store)?;
+    let wasi_env = builder.finalize(&mut store)?;
     let wasi_env_import_object = wasi_env.import_object(&mut store, &module)?;
     let mut import_object = imports! {
         // "fd_write" => Function::
